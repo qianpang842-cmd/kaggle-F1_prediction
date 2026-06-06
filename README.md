@@ -1,7 +1,10 @@
 # kaggle-F1_prediction
 项目目标：预测一级方程式车手是否会在下一圈进站。
+
 项目概述：本比赛是基于一级方程式赛车真实和模拟博弈环境设计的高阶策略预测挑战赛。
+
 目标输出：ID及其对应的进站概率。
+
 数据分析：
 1.对训练集数据的基本分析
 <img width="1596" height="186" alt="9f51794df4d9c1939dcfb6cd5b06471c" src="https://github.com/user-attachments/assets/ba3b70d1-12fd-47c2-ab38-8b0ee643e3be" />
@@ -23,15 +26,21 @@
 核心算法及方案：
 1.外部数据动态注入与样本加权
 在每折循环内部，将外部原始数据集（Original Data）拼接至当前折的训练集中，并赋予外部数据0.65的样本权重，而比赛官方数据权重保持为 1.0。
+
 2.特征工程
 由于训练集的属性并非独立，构造特征是将零散的物理观测指标转化为具备 F1 领域洞察的动态战术信号。
 磨损速率（feat-WearRace）=TyreLife/(LapNumber+1)
 边缘衰减状态（feat_LapTime_div_DegradAbs）=LapTime（s）/(Cumulative_Degradation+10**(-6))
 衰减空间斜率（feat_Degradation_Slope）=Cumulative_Degradation/（TyreLife+10**（-6））
 翻转窗口风险（feat_PitWindow_Risk）=RaceProgress*(21-Position)
+
 3.加权平滑内折目标编码
 双层嵌套内折（Inner OOF），编码用子折数据计算、杜绝标签回流。
 加权平滑TE公式，引入样本权重和全局均值平滑，小样本自动向全局均值收敛。
+
 4.异构模型混合与集成策略
 三模型加权融合：LightGBM(0.4)+XGBoost(0.35)+CatBoost(0.25)
 
+最终成绩
+<img width="1878" height="129" alt="148e7130dccd96985395e87f0508b4e0" src="https://github.com/user-attachments/assets/cdfd4525-0d16-4234-9168-8efc49c0369d" />
+765/3023，大约25%
